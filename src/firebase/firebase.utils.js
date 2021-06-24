@@ -16,6 +16,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
   const userRef = firestore.doc(`users/${userAuth.uid}`); //instead of 'users/12131414asas' we use userAuth.uid still exists: false returns but we can see id
+  
   const snapShot = await userRef.get(); // exists info retrieves.
 
   if (!snapShot.exists) {
@@ -33,9 +34,22 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
       console.log('error creating user', error.message);
     }
   }
-  console.log(snapShot);
   return userRef;
 };
+
+export const addCollectionsAndDocuments = async (collectionKey, objectsToAdd) => {
+  const collectionRef = firestore.collection(collectionKey);
+  console.log(collectionRef);
+
+  const batch = firestore.batch();
+
+  objectsToAdd.forEach(obj => {
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+  })
+
+  return await batch.commit();
+}
 
 firebase.initializeApp(config);
 
